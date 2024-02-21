@@ -1,0 +1,67 @@
+package ru.kata.spring.boot_security.demo.configs;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import ru.kata.spring.boot_security.demo.service.UserServiceImpl;
+
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig /*extends WebSecurityConfigurerAdapter */ {
+    private final SuccessUserHandler successUserHandler;
+    private final UserServiceImpl userService;
+    private final PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public WebSecurityConfig(SuccessUserHandler successUserHandler,
+                             UserServiceImpl userService,
+                             PasswordEncoder passwordEncoder) {
+        this.successUserHandler = successUserHandler;
+        this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    // @Override не удалял, поскольку мало ли кретично сделать по старому.
+    // убрать коменты SecurityFilterChain и @Bean  и будет по старому работать
+    @Bean
+    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
+        http
+                .csrf().and()
+                .authorizeRequests(authorize -> authorize
+                        .antMatchers("/", "/index/", "/login").permitAll()
+                        .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                        .antMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .usernameParameter("login")
+                        .passwordParameter("password")
+                        .successHandler(successUserHandler)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
+        return http.build();
+    }
+
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+        authenticationProvider.setPasswordEncoder(passwordEncoder);
+        authenticationProvider.setUserDetailsService(userService);
+        return authenticationProvider;
+    }
+}
