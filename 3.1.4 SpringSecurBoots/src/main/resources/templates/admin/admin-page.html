@@ -91,7 +91,7 @@
                                     <tr th:each="user : ${users}">
                                         <td th:text="${user.id}"></td>
                                         <td th:text="${user.name}"></td>
-                                        <td th:text="${user.lastName}"></td>
+                                        <td th:text="${user.lastname}"></td>
                                         <td th:text="${user.age}"></td>
                                         <td th:text="${user.email}"></td>
                                         <td>
@@ -143,7 +143,7 @@
                                                                     <label for="userLastName"><b>Last name</b></label>
                                                                     <input th:name="lastname" th:type="text"
                                                                            class="form-control" id="userLastName"
-                                                                           th:value="${user.lastName}" readonly/>
+                                                                           th:value="${user.lastname}" readonly/>
                                                                 </div>
                                                                 <br>
                                                                 <div class="loc-form-element">
@@ -216,10 +216,10 @@
                                                                 </div>
                                                                 <br>
                                                                 <div class="loc-form-element">
-                                                                    <label for="LastName1"><b>Last name</b></label>
+                                                                    <label for="LastName"><b>Last name</b></label>
                                                                     <input th:name="lastname" th:type="text"
-                                                                           class="form-control" id="LastName1"
-                                                                           th:value="${user.lastName}"/>
+                                                                           class="form-control" id="LastNameE"
+                                                                           th:value="${user.lastname}"/>
                                                                 </div>
                                                                 <br>
                                                                 <div class="loc-form-element">
@@ -297,7 +297,7 @@
 
                                     <div class="loc-form-element">
                                         <label for="lastname"><span class="fw-bold">Last Name</span></label>
-                                        <input type="text" class="form-control" id="lastname" th:field="*{lastName}"
+                                        <input type="text" class="form-control" id="lastname" th:field="*{lastname}"
                                                placeholder="Last name"/>
                                     </div>
 
